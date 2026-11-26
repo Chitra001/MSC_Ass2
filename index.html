@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<title>Satellite Systems — Study Guide</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#161a22; --panel2:#1c2230; --text:#e6eaf2; --muted:#9aa6bd;
+  --accent:#4ea1ff; --accent2:#7cf0c4; --warn:#ffb454; --border:#2a3344;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:130px;
+}
+h1,h2,h3,h4{margin:0 0 8px;line-height:1.28}
+h2{font-size:17px}
+h3{font-size:15.5px;color:var(--accent)}
+h4{font-size:14px;color:var(--text);margin-top:14px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:20px}
+li{margin:4px 0}
+b,strong{color:#f2f5fb}
+small{color:var(--muted)}
+a{color:var(--accent)}
+
+/* ---------- Header ---------- */
+.hdr{
+  position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:10px;
+  padding:calc(6px + env(safe-area-inset-top)) 12px 8px;
+  background:rgba(15,17,21,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.hdrTitle{font-size:15px;font-weight:700;letter-spacing:.2px;line-height:1.2}
+.hdrTitle span{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.iconBtn{
+  width:44px;height:44px;min-width:44px;display:grid;place-items:center;
+  background:var(--panel2);color:var(--text);border:1px solid var(--border);
+  border-radius:12px;font-size:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.iconBtn:active{background:#243046}
+
+/* ---------- Drawer ---------- */
+.drawer{
+  position:fixed;top:0;left:0;height:100%;width:280px;max-width:85vw;z-index:90;
+  background:var(--panel);border-right:1px solid var(--border);
+  transform:translateX(-102%);transition:transform .25s ease;
+  display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top);padding-bottom:calc(20px + env(safe-area-inset-bottom));
+}
+body.drawerOpen .drawer{transform:translateX(0)}
+.drawerHead{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px 10px 16px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--panel);z-index:2;
+}
+.drawerHead span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:80;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+body.drawerOpen .overlay{opacity:1;pointer-events:auto}
+.navGroup{margin:8px 0}
+.navHead{
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  padding:10px 16px 4px;font-weight:700;
+}
+.drawer a{
+  display:flex;align-items:center;min-height:44px;padding:8px 16px;
+  color:var(--text);text-decoration:none;font-size:14px;
+  border-left:3px solid transparent;
+}
+.drawer a:active,.drawer a:hover{background:var(--panel2);border-left-color:var(--accent)}
+
+/* ---------- Chips ---------- */
+.chips{
+  display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:10px 12px 4px;scrollbar-width:none;
+}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;padding:0 15px;
+  border-radius:999px;background:var(--panel2);border:1px solid var(--border);
+  color:var(--text);text-decoration:none;font-size:13.5px;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.chip:active{background:#243046}
+
+/* ---------- Layout ---------- */
+main{padding:6px 12px 0;max-width:1100px;margin:0 auto}
+#sections{display:block}
+section{
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  padding:14px;margin:14px 0;scroll-margin-top:74px;
+}
+@media (min-width:560px){
+  #sections{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  section{margin:0}
+  #formulas{grid-column:1/-1}
+}
+@media (min-width:900px){
+  #sections{grid-template-columns:1fr 1fr}
+}
+
+/* ---------- Mode filtering ---------- */
+body[data-mode="notes"] section:not(.mode-notes),
+body[data-mode="numericals"] section:not(.mode-numericals),
+body[data-mode="formulas"] section:not(.mode-formulas){display:none}
+
+body[data-mode="notes"] .chip:not(.mode-notes),
+body[data-mode="numericals"] .chip:not(.mode-numericals),
+body[data-mode="formulas"] .chip:not(.mode-formulas),
+body[data-mode="notes"] .navLink:not(.mode-notes),
+body[data-mode="numericals"] .navLink:not(.mode-numericals),
+body[data-mode="formulas"] .navLink:not(.mode-formulas){display:none}
+
+/* ---------- Formula boxes ---------- */
+.formula{
+  background:var(--panel2);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:10px;padding:10px 12px;margin:10px 0;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.formula .lbl{
+  font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:6px;font-weight:700;
+}
+.formula .eq{
+  font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+  font-size:14.5px;color:var(--text);line-height:1.7;word-break:break-word;
+}
+.formula.result{border-left-color:var(--accent2);background:rgba(124,240,196,.07);border-color:rgba(124,240,196,.28)}
+.formula.result .eq{color:var(--accent2);font-weight:700}
+.formula.result .lbl{color:var(--accent2)}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .22em;line-height:1.2}
+.frac .num{border-bottom:1px solid currentColor;padding:0 .3em}
+.frac .den{padding:0 .3em}
+
+/* ---------- Vars ---------- */
+.vars{
+  background:var(--panel);border:1px dashed var(--border);border-radius:10px;
+  padding:9px 12px;margin:8px 0;font-size:13.5px;color:var(--muted);
+}
+.vars > div{padding:2.5px 0}
+.vars b{color:var(--accent);font-weight:700}
+.vars .u{color:var(--text)}
+
+/* ---------- Tables ---------- */
+.tableWrap{
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border:1px solid var(--border);border-radius:10px;margin:10px 0;
+}
+table{border-collapse:collapse;width:100%;min-width:420px;font-size:13.5px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--panel2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+tr:last-child td{border-bottom:0}
+
+/* ---------- Details ---------- */
+details{
+  background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+  padding:0;margin:10px 0;overflow:hidden;
+}
+summary{
+  list-style:none;cursor:pointer;padding:12px 14px;min-height:44px;
+  display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;
+  color:var(--text);-webkit-tap-highlight-color:transparent;
+}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";color:var(--accent);font-size:12px;transition:transform .2s}
+details[open] summary::before{transform:rotate(90deg)}
+details > div{padding:0 14px 12px}
+
+/* ---------- Misc ---------- */
+.key{color:var(--accent2);font-weight:700}
+.warn{color:var(--warn);font-weight:700}
+.note{
+  border-left:3px solid var(--warn);background:rgba(255,180,84,.08);
+  border-radius:0 10px 10px 0;padding:9px 12px;margin:10px 0;font-size:13.5px;
+}
+.q{
+  background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;margin:10px 0;font-size:13.8px;color:var(--text);
+}
+.q b{color:var(--warn)}
+
+/* ---------- Image slots ---------- */
+.imgSlot{
+  margin:12px 0;padding:10px;background:var(--panel2);border:1px solid var(--border);
+  border-radius:12px;
+}
+.imgSlot img{width:100%;display:block;border-radius:10px}
+.imgSlot .ph{
+  display:grid;place-items:center;min-height:110px;border:1px dashed var(--border);
+  border-radius:10px;color:var(--muted);font-size:12.5px;text-align:center;padding:10px;
+  font-family:ui-monospace,Consolas,monospace;
+}
+.imgSlot figcaption{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
+
+/* ---------- Formula lookup cards ---------- */
+.flookupCards{display:block}
+@media (min-width:700px){
+  .flookupCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+}
+.flookup{
+  background:var(--panel2);border:1px solid var(--border);border-radius:12px;
+  padding:12px;margin:12px 0;
+}
+@media (min-width:700px){.flookup{margin:0}}
+.flookup h4{margin:0 0 6px;color:var(--accent2);font-size:13.5px;letter-spacing:.02em}
+
+/* ---------- Floating controls ---------- */
+#toTop{
+  position:fixed;right:14px;bottom:calc(80px + env(safe-area-inset-bottom));
+  width:46px;height:46px;border-radius:50%;z-index:65;
+  background:var(--panel2);border:1px solid var(--border);color:var(--text);
+  display:grid;place-items:center;font-size:18px;cursor:pointer;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+body.scrolled #toTop{opacity:1;pointer-events:auto}
+
+#modeSwitch{
+  position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;
+  transform:translateX(-50%);z-index:70;display:flex;gap:4px;padding:4px;
+  border-radius:999px;background:var(--panel);border:1px solid var(--border);
+  box-shadow:0 10px 28px rgba(0,0,0,.5);
+}
+#modeSwitch button{
+  min-height:44px;padding:0 13px;border-radius:999px;border:0;
+  background:var(--panel2);color:var(--muted);font-size:13px;font-weight:700;
+  cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;
+  font-family:inherit;
+}
+#modeSwitch button.active{background:var(--accent);color:#06111f}
+</style>
+</head>
+
+<body data-mode="notes">
+
+<!-- ============ HEADER ============ -->
+<header class="hdr">
+  <button id="menuBtn" class="iconBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">☰</button>
+  <div class="hdrTitle">Satellite Systems<span>Study Guide</span></div>
+</header>
+
+<!-- ============ DRAWER ============ -->
+<aside id="drawer" class="drawer" aria-hidden="true" aria-label="Section navigation">
+  <div class="drawerHead">
+    <span>Contents</span>
+    <button id="drawerClose" class="iconBtn" aria-label="Close menu">✕</button>
+  </div>
+  <nav>
+    <div class="navGroup">
+      <div class="navHead">📘 Notes</div>
+      <a class="navLink mode-notes" href="#sec1">1 · Frequency Allocation</a>
+      <a class="navLink mode-notes" href="#sec2">2 · ITU Regions &amp; Services</a>
+      <a class="navLink mode-notes" href="#sec3">3 · Kepler's Laws</a>
+      <a class="navLink mode-notes" href="#sec4">4 · Six Orbital Elements</a>
+      <a class="navLink mode-notes" href="#sec5">5 · Why Elements Matter</a>
+      <a class="navLink mode-notes" href="#sec6">6 · Perturbations</a>
+    </div>
+    <div class="navGroup">
+      <div class="navHead">🧮 Numericals</div>
+      <a class="navLink mode-numericals" href="#num-kepler">7 · Kepler Worked Examples</a>
+      <a class="navLink mode-numericals" href="#num-coe">8 · Cartesian → Orbital Elements</a>
+      <a class="navLink mode-numericals" href="#num-lunisolar">9 · Lunisolar Perturbation</a>
+    </div>
+    <div class="navGroup">
+      <div class="navHead">📐 Formulas</div>
+      <a class="navLink mode-formulas" href="#formulas">10 · All Formulas + Variables</a>
+    </div>
+  </nav>
+</aside>
+<div id="overlay" class="overlay"></div>
+
+<!-- ============ MAIN ============ -->
+<main>
+
+  <!-- Quick chips -->
+  <div class="chips" id="chips">
+    <a class="chip mode-notes" href="#sec1">📡 Spectrum</a>
+    <a class="chip mode-notes" href="#sec2">🌍 ITU Regions</a>
+    <a class="chip mode-notes" href="#sec3">🪐 Kepler</a>
+    <a class="chip mode-notes" href="#sec4">🛰️ 6 Elements</a>
+    <a class="chip mode-notes" href="#sec6">🌀 Perturbations</a>
+    <a class="chip mode-numericals" href="#num-kepler">🧮 Kepler Numericals</a>
+    <a class="chip mode-numericals" href="#num-coe">🧮 Cartesian → COE</a>
+    <a class="chip mode-numericals" href="#num-lunisolar">🧮 Lunisolar Drift</a>
+    <a class="chip mode-formulas" href="#formulas">📐 Formula Sheet</a>
+  </div>
+
+  <div id="sections">
+
+  <!-- ================= SECTION 1 ================= -->
+  <section id="sec1" class="mode-notes">
+    <h2>1 · Frequency Allocation for Satellite Services</h2>
+
+    <p>Frequency allocation for satellite services is an intricate process <b>coordinated and managed globally by the International Telecommunication Union (ITU)</b> to prevent signal interference across national borders.</p>
+
+    <ul>
+      <li>It is divided into <span class="key">three geographic regions</span>.</li>
+      <li>It uses <span class="key">multiple radio bands</span> — L, S, C, X, Ku and Ka — to support services such as <b>Fixed Satellite Service (FSS)</b>, <b>Broadcasting Satellite Service (BSS)</b> and <b>Mobile Satellite Service (MSS)</b>.</li>
+      <li>In India, these allocations are governed by the <span class="key">WPC Wing</span> under the <span class="key">National Frequency Allocation Plan (NFAP)</span>.</li>
+    </ul>
+
+    <h3>Key Regulatory Bodies</h3>
+
+    <details open>
+      <summary>International Telecommunication Union (ITU)</summary>
+      <div>
+        <p>A <b>United Nations agency</b> that coordinates global radio spectrum and satellite orbits across international borders.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>National Authorities (e.g., WPC in India)</summary>
+      <div>
+        <p>Local governments adapt international treaties into national plans (such as India's <b>National Frequency Allocation Plan</b>) to license and manage spectrum inside their borders.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ================= SECTION 2 ================= -->
+  <section id="sec2" class="mode-notes">
+    <h2>2 · ITU Regions &amp; Core Satellite Services</h2>
+
+    <h3>ITU Regions for Spectrum Planning</h3>
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr><th>Region</th><th>Geographic Coverage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Region 1</b></td><td>Europe, Africa, the Middle East, former Soviet Union, and Mongolia.</td></tr>
+          <tr><td><b>Region 2</b></td><td>North America, South America, and Greenland.</td></tr>
+          <tr><td><b>Region 3</b></td><td>Asia (including India), Australia, and the Southwest Pacific.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Core Satellite Services (ITU Definitions)</h3>
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr><th>Service</th><th>Definition / Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>FSS</b> — Fixed Satellite Service</td><td>Links between earth stations at given positions (e.g. telephonic networks and TV signal trunking).</td></tr>
+          <tr><td><b>BSS</b> — Broadcasting Satellite Service</td><td>Radio/TV signals intended for direct reception by the general public (DTH).</td></tr>
+          <tr><td><b>MSS</b> — Mobile Satellite Service</td><td>Communication between mobile earth stations and space stations (land, maritime, aeronautical).</td></tr>
+          <tr><td><b>NSS</b> — Navigational Satellite Service</td><td>Position, velocity and time determination for navigation (e.g. GPS, NavIC).</td></tr>
+          <tr><td><b>MSS</b> — Meteorological Satellite Service</td><td>Earth observation and environmental / weather tracking data transmission.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <b class="warn">Watch the abbreviation clash:</b> the notes use <b>MSS</b> for both <b>Mobile</b> Satellite Service and <b>Meteorological</b> Satellite Service. In exams, always write the full service name.
+    </div>
+  </section>
+
+  <!-- ================= SECTION 3 ================= -->
+  <section id="sec3" class="mode-notes">
+    <h2>3 · Kepler's Laws of Planetary Motion</h2>
+
+    <p>Kepler's laws describe planetary motion. They are three scientific rules discovered by the German astronomer <b>Johannes Kepler</b> between <b>1609 and 1621</b>. They state that:</p>
+    <ol>
+      <li>Planets orbit the Sun in <b>ellipses</b>,</li>
+      <li>They sweep out <b>equal areas in equal times</b>,</li>
+      <li>Their orbital periods are <b>proportional to the cube of their distance</b>.</li>
+    </ol>
+
+    <h3>First Law — Law of Orbits</h3>
+    <p>A planet orbits the Sun in an ellipse, with the <b>Sun located at one of the two foci</b>. The closest point in the orbit is the <span class="key">perihelion</span> and the farthest point is the <span class="key">aphelion</span>.</p>
+
+    <div class="formula">
+      <div class="lbl">Semi-major axis from apsides</div>
+      <div class="eq">a = <span class="frac"><span class="num">r<sub>min</sub> + r<sub>max</sub></span><span class="den">2</span></span></div>
+    </div>
+
+    <h3>Second Law — Law of Equal Areas</h3>
+    <p>The line joining a planet to the Sun sweeps out equal areas in equal time intervals. This means planets travel <b>faster when closer to the Sun</b> (perihelion) and <b>slower when farther away</b> (aphelion).</p>
+
+    <div class="formula">
+      <div class="lbl">Areal velocity (constant)</div>
+      <div class="eq"><span class="frac"><span class="num">ΔA</span><span class="den">Δt</span></span> = constant</div>
+    </div>
+
+    <h3>Third Law — Law of Periods</h3>
+    <p>The square of the orbital period <b>T</b> of a planet is directly proportional to the cube of the semi-major axis <b>a</b> of its orbit.</p>
+
+    <div class="formula">
+      <div class="lbl">Kepler's third law (general)</div>
+      <div class="eq">T<sup>2</sup> = <span class="frac"><span class="num">4π<sup>2</sup></span><span class="den">GM</span></span> a<sup>3</sup></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Ratio form</div>
+      <div class="eq">T<sup>2</sup> = k · a<sup>3</sup> &nbsp;&nbsp;or&nbsp;&nbsp; <span class="frac"><span class="num">T<sub>1</sub><sup>2</sup></span><span class="den">T<sub>2</sub><sup>2</sup></span></span> = <span class="frac"><span class="num">a<sub>1</sub><sup>3</sup></span><span class="den">a<sub>2</sub><sup>3</sup></span></span></div>
+    </div>
+
+    <h3>Simplified Solar-System Form</h3>
+    <p>If expressed in the following units:</p>
+    <ul>
+      <li><b>T</b> in Earth years</li>
+      <li><b>a</b> in Astronomical Units (AU) &nbsp;(a = 1 AU for Earth)</li>
+      <li><b>M</b> in Solar masses (M<sub>☉</sub>)</li>
+    </ul>
+    <p>then <span class="key">4π²/G = 1</span>, and the law can be expressed simply as:</p>
+
+    <div class="formula result">
+      <div class="lbl">Simplified third law</div>
+      <div class="eq">T<sup>2</sup> = a<sup>3</sup></div>
+    </div>
+
+    <div class="vars">
+      <div><b>T</b> — orbital period <span class="u">(Earth years)</span></div>
+      <div><b>a</b> — semi-major axis <span class="u">(AU)</span></div>
+      <div><b>G</b> — gravitational constant <span class="u">(6.674×10<sup>−11</sup> m<sup>3</sup>·kg<sup>−1</sup>·s<sup>−2</sup>)</span></div>
+      <div><b>M</b> — mass of the central body <span class="u">(kg, or M<sub>☉</sub> in solar units)</span></div>
+      <div><b>k</b> — proportionality constant <span class="u">(= 1 in solar units)</span></div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 4 ================= -->
+  <section id="sec4" class="mode-notes">
+    <h2>4 · Orbital Elements (Six Keplerian Parameters)</h2>
+
+    <p>To visualize how a satellite moves in space, engineers use <b>six Keplerian orbital elements</b> to define its path, <b>look angles</b> to point ground-station antennas toward it, and <b>orbital perturbations</b> (like Earth's oblateness, or the <span class="key">J<sub>2</sub> effect</span>) that cause these parameters to change over time.</p>
+
+    <p>When visualizing these elements, we reference the <b>Geocentric Equatorial Inertial (ECI) frame</b>, where the Earth's equatorial plane acts as the base reference plane.</p>
+
+    <p><b>Orbital elements</b> are the six parameters needed to uniquely define and describe the path (orbit) of one object moving around another in space — such as a planet around the Sun, or a satellite around the Earth. In satellite communication they mathematically describe and uniquely specify the <b>size, shape, orientation and position</b> of a satellite's orbit.</p>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Element</th><th>Symbol</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Semi-major axis</td><td>a</td><td>Size</td></tr>
+          <tr><td>2</td><td>Eccentricity</td><td>e</td><td>Shape</td></tr>
+          <tr><td>3</td><td>Inclination</td><td>i</td><td>Tilt</td></tr>
+          <tr><td>4</td><td>Longitude of Ascending Node (RAAN)</td><td>Ω</td><td>Twist</td></tr>
+          <tr><td>5</td><td>Argument of Periapsis / Perigee</td><td>ω</td><td>Rotation</td></tr>
+          <tr><td>6</td><td>True Anomaly / Mean Anomaly</td><td>ν or M</td><td>Position</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details open>
+      <summary>1 · Semi-Major Axis (a) — SIZE</summary>
+      <div>
+        <p>Measures the size of the orbit — <b>half of the longest diameter of an ellipse</b> (stretching from perigee to apogee through the centre of the Earth). For a circular orbit, it is simply the <b>radius</b> (a = r). It determines the satellite's <b>orbital period</b> and average distance from Earth.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>2 · Eccentricity (e) — SHAPE</summary>
+      <div>
+        <p>Describes how stretched or round the orbit is:</p>
+        <ul>
+          <li><b>e = 0</b> — perfectly circular orbit</li>
+          <li><b>0 &lt; e &lt; 1</b> — elliptical orbit (most common)</li>
+          <li><b>e = 1</b> — parabolic trajectory (unbound path)</li>
+          <li><b>e &gt; 1</b> — hyperbolic trajectory (unbound path)</li>
+        </ul>
+      </div>
+    </details>
+
+    <details open>
+      <summary>3 · Inclination (i) — TILT</summary>
+      <div>
+        <p>Measures the vertical tilt of the orbital plane relative to a reference plane (Earth's equatorial plane or the Sun's ecliptic), ranging from <b>0° to 180°</b>, measured at the ascending node:</p>
+        <ul>
+          <li><b>0°</b> — equatorial orbit</li>
+          <li><b>90°</b> — polar orbit</li>
+          <li><b>0° ≤ i &lt; 90°</b> — prograde orbit (rotates in the same direction as Earth)</li>
+          <li><b>90° &lt; i ≤ 180°</b> — retrograde orbit (rotates opposite to Earth)</li>
+        </ul>
+      </div>
+    </details>
+
+    <details open>
+      <summary>4 · Right Ascension of the Ascending Node (Ω / RAAN) — TWIST</summary>
+      <div>
+        <p>Defines the <b>horizontal orientation of the orbital plane in space</b>. It is the angle measured <b>eastward</b> in the equatorial plane from the <b>vernal equinox</b> (first point of Aries) to the <b>ascending node</b> — the point where the satellite crosses the equator moving from <b>south to north</b>.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>5 · Argument of Perigee (ω) — ROTATION</summary>
+      <div>
+        <p>Defines the <b>orientation of the ellipse within its orbital plane</b>. It is the angle measured along the orbital path from the <b>ascending node</b> to the <b>perigee</b> (the point where the satellite is closest to Earth).</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>6 · Mean Anomaly (M) / True Anomaly (ν) — POSITION</summary>
+      <div>
+        <p>Defines the <b>position of the satellite along its orbit at a specific reference time (epoch)</b>. It describes the fractional progress of the satellite around its orbital period relative to perigee:</p>
+        <ul>
+          <li><b>0°</b> at perigee</li>
+          <li><b>180°</b> at apogee</li>
+          <li><b>360°</b> after a full revolution</li>
+        </ul>
+      </div>
+    </details>
+
+    <div class="formula">
+      <div class="lbl">Standard element set (units)</div>
+      <div class="eq">
+        a [m] &nbsp;·&nbsp; e [–] &nbsp;·&nbsp; i [rad]<br>
+        ω [rad] &nbsp;·&nbsp; Ω [rad] &nbsp;·&nbsp; M [rad]
+      </div>
+    </div>
+
+    <p><small>All six orbital-element concepts and analysis are applicable to orbits such as LEO, MEO and GEO.</small></p>
+
+    <!-- IMAGE SLOTS: after Pg 21 -->
+    <figure class="imgSlot" data-img="img1" data-cap="Figure 1 — Pg 21">
+      <div class="ph">img1.jpg</div>
+      <figcaption>Figure 1 · after Pg 21 content</figcaption>
+    </figure>
+    <figure class="imgSlot" data-img="img2" data-cap="Figure 2 — Pg 21">
+      <div class="ph">img2.jpg</div>
+      <figcaption>Figure 2 · after Pg 21 content</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= SECTION 5 ================= -->
+  <section id="sec5" class="mode-notes">
+    <h2>5 · Why Orbital Elements Matter in Satellite Communication</h2>
+
+    <details open>
+      <summary>Prediction</summary>
+      <div>
+        <p>Once you know these six values for a satellite or planet, you can calculate <b>where it was in the past and where it will be in the future</b>.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Standard Formats</summary>
+      <div>
+        <p>They are frequently packed into standard data strings like <span class="key">TLEs (Two-Line Element sets)</span> used across aerospace and astronomy, tracking software and ground networks.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Antenna Tracking ("Look Angles")</summary>
+      <div>
+        <p>Ground stations use these elements to calculate precise <b>azimuth and elevation</b> angles so directional antennas can track and communicate with the satellite — essential for moving LEO or HEO satellites.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Satellite Identification</summary>
+      <div>
+        <p>They distinguish different satellites sharing similar orbital regimes and allow operators to predict future positions.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Handover &amp; Coverage</summary>
+      <div>
+        <p>Knowing the <b>semi-major axis</b> and <b>inclination</b> helps predict footprint coverage, signal delay and handovers between constellation nodes.</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Perturbation Tracking</summary>
+      <div>
+        <p>Real-world forces — <b>atmospheric drag</b>, <b>solar radiation pressure</b> and <b>Earth's oblateness</b> — continuously alter these elements, requiring regular <b>Two-Line Element (TLE) updates</b>.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ================= SECTION 6 ================= -->
+  <section id="sec6" class="mode-notes">
+    <h2>6 · Orbital Perturbations &amp; Visualising the Orbit</h2>
+
+    <p>In a simple circular orbit (as sketched in the notes), the satellite moves with a <b>tangential velocity</b> while the <b>gravitational force</b> points toward the Earth's centre, keeping it on a path of <b>constant altitude</b>. In reality, the six Keplerian elements are not fixed — they drift.</p>
+
+    <ul>
+      <li><span class="key">Earth's oblateness (J<sub>2</sub>)</span> — the dominant perturbation; causes the orbital plane and the line of apsides to precess (drift) over time.</li>
+      <li><span class="key">Atmospheric drag</span> — significant in LEO; shrinks the semi-major axis and lowers the orbit.</li>
+      <li><span class="key">Solar radiation pressure</span> — small but persistent, especially for large-area spacecraft.</li>
+      <li><span class="key">Third-body (lunisolar) gravity</span> — the Moon and Sun slowly change a satellite's inclination and node; dominant for GEO satellites.</li>
+    </ul>
+
+    <p>These effects are why the six orbital elements must be refreshed regularly (via TLEs), and why GEO satellites require <b>north–south station-keeping</b> (see the worked example in the Numericals mode).</p>
+
+    <!-- IMAGE SLOTS: after Pg 27 -->
+    <figure class="imgSlot" data-img="img3" data-cap="Figure 3 — Pg 27">
+      <div class="ph">img3.jpg</div>
+      <figcaption>Figure 3 · after Pg 27 content</figcaption>
+    </figure>
+    <figure class="imgSlot" data-img="img4" data-cap="Figure 4 — Pg 27">
+      <div class="ph">img4.jpg</div>
+      <figcaption>Figure 4 · after Pg 27 content</figcaption>
+    </figure>
+    <figure class="imgSlot" data-img="img5" data-cap="Figure 5 — Pg 27">
+      <div class="ph">img5.jpg</div>
+      <figcaption>Figure 5 · after Pg 27 content</figcaption>
+    </figure>
+    <figure class="imgSlot" data-img="img6" data-cap="Figure 6 — Pg 27">
+      <div class="ph">img6.jpg</div>
+      <figcaption>Figure 6 · after Pg 27 content</figcaption>
+    </figure>
+    <figure class="imgSlot" data-img="img7" data-cap="Figure 7 — Pg 27">
+      <div class="ph">img7.jpg</div>
+      <figcaption>Figure 7 · after Pg 27 content</figcaption>
+    </figure>
+    <figure class="imgSlot" data-img="img8" data-cap="Figure 8 — Pg 27">
+      <div class="ph">img8.jpg</div>
+      <figcaption>Figure 8 · after Pg 27 content</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= SECTION 7 : KEPLER NUMERICALS ================= -->
+  <section id="num-kepler" class="mode-numericals">
+    <h2>7 · Kepler's Laws — Solved Numericals</h2>
+
+    <!-- ---------- Numerical 1 ---------- -->
+    <h3>Numerical 1 — Orbital Period of an Asteroid (Solar System)</h3>
+    <div class="q">
+      <b>Question:</b> An asteroid is discovered orbiting the Sun at an average distance (semi-major axis) of <b>4 AU</b>. How many Earth years does it take for this asteroid to complete one full orbit around the Sun?
+    </div>
+
+    <h4>Step 1 — Choose the simplified third law</h4>
+    <p>When an object orbits our Sun, we use Earth's metrics as a baseline (T<sub>Earth</sub> = 1 year, a<sub>Earth</sub> = 1 AU). This simplifies Kepler's Third Law directly to:</p>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">T<sup>2</sup> = a<sup>3</sup></div>
+    </div>
+
+    <div class="vars">
+      <div><b>T</b> — orbital period of the asteroid <span class="u">(Earth years)</span></div>
+      <div><b>a</b> — semi-major axis of the orbit <span class="u">(AU)</span></div>
+      <div><b>T<sub>Earth</sub></b> — baseline period = 1 year</div>
+      <div><b>a<sub>Earth</sub></b> — baseline distance = 1 AU</div>
+    </div>
+
+    <h4>Step 2 — Cube the semi-major axis</h4>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">a = 4 AU &nbsp;→&nbsp; a<sup>3</sup> = 4 × 4 × 4 = 64</div>
+    </div>
+
+    <div class="vars">
+      <div><b>a</b> — given semi-major axis <span class="u">(= 4 AU)</span></div>
+      <div><b>a<sup>3</sup></b> — cube of the semi-major axis <span class="u">(AU<sup>3</sup>)</span></div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 2</div>
+      <div class="eq">T<sup>2</sup> = 64</div>
+    </div>
+
+    <h4>Step 3 — Take the square root</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">T = √(a<sup>3</sup>) = √(T<sup>2</sup>)</div>
+    </div>
+
+    <div class="vars">
+      <div><b>T</b> — orbital period <span class="u">(Earth years)</span></div>
+      <div><b>T<sup>2</sup></b> — squared period <span class="u">(= 64 yr<sup>2</sup>)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">T = √64 = 8</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Final answer</div>
+      <div class="eq">T = 8 Earth years</div>
+    </div>
+
+    <!-- ---------- Numerical 2 ---------- -->
+    <h3>Numerical 2 — Finding an Orbital Distance (Exoplanet System)</h3>
+    <div class="q">
+      <b>Question:</b> An exoplanet is detected orbiting a distant star. Space telescopes determine that the planet completes its orbit in <b>27 Earth years</b>. If the star behaves exactly like our Sun, what is the planet's average distance from it in AU?
+    </div>
+
+    <h4>Step 1 — Use the simplified Solar-mass relationship</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">T<sup>2</sup> = a<sup>3</sup></div>
+    </div>
+
+    <div class="vars">
+      <div><b>T</b> — orbital period <span class="u">(Earth years)</span></div>
+      <div><b>a</b> — semi-major axis / average distance <span class="u">(AU)</span></div>
+    </div>
+
+    <h4>Step 2 — Square the orbital period</h4>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">T = 27 years &nbsp;→&nbsp; T<sup>2</sup> = 27 × 27 = 729</div>
+    </div>
+
+    <div class="vars">
+      <div><b>T</b> — given orbital period <span class="u">(= 27 years)</span></div>
+      <div><b>T<sup>2</sup></b> — squared period <span class="u">(yr<sup>2</sup>)</span></div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 2</div>
+      <div class="eq">729 = a<sup>3</sup></div>
+    </div>
+
+    <h4>Step 3 — Take the cube root</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">a = ∛(a<sup>3</sup>) = ∛(T<sup>2</sup>)</div>
+    </div>
+
+    <div class="vars">
+      <div><b>a</b> — semi-major axis <span class="u">(AU)</span></div>
+      <div><b>a<sup>3</sup></b> — cube of semi-major axis <span class="u">(= 729 AU<sup>3</sup>)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">a = ∛729 = 9</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Final answer</div>
+      <div class="eq">a = 9 AU</div>
+    </div>
+
+    <!-- ---------- Numerical 3 ---------- -->
+    <h3>Numerical 3 — Kepler's First Law: Semi-Major Axis &amp; Eccentricity</h3>
+    <div class="q">
+      <b>Question:</b> An asteroid moves in an elliptical orbit around the Sun. Its closest distance (perihelion) is <b>r<sub>min</sub> = 1.0 AU</b> and its farthest distance (aphelion) is <b>r<sub>max</sub> = 3.0 AU</b>. Find the semi-major axis (a) and the eccentricity (e) of the orbit.
+    </div>
+
+    <h4>Step 1 — Find the semi-major axis</h4>
+    <p>The semi-major axis is the average of the perihelion and aphelion distances.</p>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">a = <span class="frac"><span class="num">r<sub>min</sub> + r<sub>max</sub></span><span class="den">2</span></span></div>
+    </div>
+
+    <div class="vars">
+      <div><b>a</b> — semi-major axis <span class="u">(AU)</span></div>
+      <div><b>r<sub>min</sub></b> — perihelion distance <span class="u">(AU)</span></div>
+      <div><b>r<sub>max</sub></b> — aphelion distance <span class="u">(AU)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">a = <span class="frac"><span class="num">1.0 + 3.0</span><span class="den">2</span></span> = <span class="frac"><span class="num">4.0</span><span class="den">2</span></span></div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 1</div>
+      <div class="eq">a = 2.0 AU</div>
+    </div>
+
+    <h4>Step 2 — Find the focal distance c</h4>
+    <p>The distance from the centre of the ellipse to a focus is the semi-major axis minus the perihelion distance.</p>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">c = a − r<sub>min</sub></div>
+    </div>
+
+    <div class="vars">
+      <div><b>c</b> — focal distance from ellipse centre <span class="u">(AU)</span></div>
+      <div><b>a</b> — semi-major axis <span class="u">(= 2.0 AU)</span></div>
+      <div><b>r<sub>min</sub></b> — perihelion distance <span class="u">(= 1.0 AU)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">c = 2.0 − 1.0 = 1.0</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 2</div>
+      <div class="eq">c = 1.0 AU</div>
+    </div>
+
+    <h4>Step 3 — Compute the eccentricity</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">e = <span class="frac"><span class="num">c</span><span class="den">a</span></span></div>
+    </div>
+
+    <div class="vars">
+      <div><b>e</b> — eccentricity <span class="u">(dimensionless, 0 ≤ e &lt; 1)</span></div>
+      <div><b>c</b> — focal distance <span class="u">(= 1.0 AU)</span></div>
+      <div><b>a</b> — semi-major axis <span class="u">(= 2.0 AU)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">e = <span class="frac"><span class="num">1.0</span><span class="den">2.0</span></span> = 0.5</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Final answer</div>
+      <div class="eq">a = 2.0 AU &nbsp;&nbsp;and&nbsp;&nbsp; e = 0.5</div>
+    </div>
+
+    <!-- ---------- Numerical 4 ---------- -->
+    <h3>Numerical 4 — Kepler's Second Law: Equal Areas</h3>
+    <div class="q">
+      <b>Question:</b> A planet takes <b>5 days</b> to sweep out a triangular area <b>A<sub>1</sub> = 2.0 × 10<sup>12</sup> km<sup>2</sup></b> near its perihelion. How much area (A<sub>2</sub>) does it sweep out in 5 days when it is near its aphelion?
+    </div>
+
+    <h4>Step 1 — State the law of equal areas</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq"><span class="frac"><span class="num">ΔA</span><span class="den">Δt</span></span> = constant &nbsp;⟹&nbsp; <span class="frac"><span class="num">A<sub>1</sub></span><span class="den">Δt<sub>1</sub></span></span> = <span class="frac"><span class="num">A<sub>2</sub></span><span class="den">Δt<sub>2</sub></span></span></div>
+    </div>
+
+    <div class="vars">
+      <div><b>ΔA</b> — area swept out by the radius vector <span class="u">(km<sup>2</sup>)</span></div>
+      <div><b>Δt</b> — time interval <span class="u">(days)</span></div>
+      <div><b>A<sub>1</sub></b> — area swept near perihelion <span class="u">(= 2.0 × 10<sup>12</sup> km<sup>2</sup>)</span></div>
+      <div><b>A<sub>2</sub></b> — area swept near aphelion <span class="u">(km<sup>2</sup>)</span></div>
+      <div><b>Δt<sub>1</sub></b> — first time interval <span class="u">(= 5 days)</span></div>
+      <div><b>Δt<sub>2</sub></b> — second time interval <span class="u">(= 5 days)</span></div>
+    </div>
+
+    <h4>Step 2 — Apply the equal-time condition</h4>
+    <p>The areal velocity is constant, and since the time interval is equal in both cases (5 days), the swept area must also be equal:</p>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">Δt<sub>1</sub> = Δt<sub>2</sub> = 5 days &nbsp;⟹&nbsp; A<sub>2</sub> = A<sub>1</sub></div>
+    </div>
+
+    <div class="vars">
+      <div><b>A<sub>2</sub></b> — unknown swept area <span class="u">(km<sup>2</sup>)</span></div>
+      <div><b>A<sub>1</sub></b> — known swept area <span class="u">(= 2.0 × 10<sup>12</sup> km<sup>2</sup>)</span></div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Final answer</div>
+      <div class="eq">A<sub>2</sub> = A<sub>1</sub> = 2.0 × 10<sup>12</sup> km<sup>2</sup></div>
+    </div>
+
+    <!-- ---------- Numerical 5 ---------- -->
+    <h3>Numerical 5 — Kepler's Third Law: Orbital Period of Mars</h3>
+    <div class="q">
+      <b>Question:</b> Mars has a semi-major axis of <b>a<sub>Mars</sub> = 1.524 AU</b>. Using Earth as a baseline (a<sub>Earth</sub> = 1.0 AU, T<sub>Earth</sub> = 1 year), calculate the orbital period of Mars in Earth years.
+    </div>
+
+    <h4>Step 1 — Write the ratio form of the third law</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">( <span class="frac"><span class="num">T<sub>Mars</sub></span><span class="den">T<sub>Earth</sub></span></span> )<sup>2</sup> = ( <span class="frac"><span class="num">a<sub>Mars</sub></span><span class="den">a<sub>Earth</sub></span></span> )<sup>3</sup></div>
+    </div>
+
+    <div class="vars">
+      <div><b>T<sub>Mars</sub></b> — orbital period of Mars <span class="u">(Earth years)</span></div>
+      <div><b>T<sub>Earth</sub></b> — orbital period of Earth <span class="u">(= 1 year)</span></div>
+      <div><b>a<sub>Mars</sub></b> — semi-major axis of Mars <span class="u">(= 1.524 AU)</span></div>
+      <div><b>a<sub>Earth</sub></b> — semi-major axis of Earth <span class="u">(= 1.0 AU)</span></div>
+    </div>
+
+    <h4>Step 2 — Substitute the known values</h4>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">T<sub>Mars</sub><sup>2</sup> = (1.524)<sup>3</sup> ≈ 3.5396</div>
+    </div>
+
+    <div class="vars">
+      <div><b>T<sub>Mars</sub><sup>2</sup></b> — squared orbital period <span class="u">(yr<sup>2</sup>)</span></div>
+      <div><b>1.524</b> — ratio a<sub>Mars</sub>/a<sub>Earth</sub> <span class="u">(dimensionless)</span></div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 2</div>
+      <div class="eq">T<sub>Mars</sub><sup>2</sup> ≈ 3.5396 yr<sup>2</sup></div>
+    </div>
+
+    <h4>Step 3 — Take the square root</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">T<sub>Mars</sub> = √(T<sub>Mars</sub><sup>2</sup>)</div>
+    </div>
+
+    <div class="vars">
+      <div><b>T<sub>Mars</sub></b> — orbital period <span class="u">(Earth years)</span></div>
+      <div><b>T<sub>Mars</sub><sup>2</sup></b> — squared period <span class="u">(= 3.5396 yr<sup>2</sup>)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">T<sub>Mars</sub> = √3.5396 ≈ 1.88</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Final answer</div>
+      <div class="eq">T<sub>Mars</sub> ≈ 1.88 Earth years (≈ 687 days)</div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 8 : CARTESIAN → COE ================= -->
+  <section id="num-coe" class="mode-numericals">
+    <h2>8 · Solved Example: Cartesian Vectors → Classical Orbital Elements</h2>
+
+    <p>To determine the shape, orientation and real-time position of a spacecraft, we convert its Cartesian position vector <b>r⃗</b> and velocity vector <b>v⃗</b> into the six <b>Classical Orbital Elements (COEs)</b>:</p>
+    <ol>
+      <li><b>a</b> — size of the orbit</li>
+      <li><b>e</b> — shape of the orbit</li>
+      <li><b>i</b> — tilt of the orbital plane relative to the equator</li>
+      <li><b>Ω</b> — twist (RAAN) of the orbital plane</li>
+      <li><b>ω</b> — orientation of the orbit within its plane</li>
+      <li><b>ν</b> — position of the satellite along the path</li>
+    </ol>
+
+    <div class="q">
+      <b>Problem statement:</b> A satellite orbiting Earth has the following position and velocity vectors in the Geocentric Equatorial Inertial (GEI) frame:<br><br>
+      <b>r⃗</b> = 6500 î + 3400 ĵ + 4100 k̂ &nbsp;(km)<br>
+      <b>v⃗</b> = −4.9 î + 5.2 ĵ + 3.4 k̂ &nbsp;(km/s)<br><br>
+      Calculate the 6 Classical Orbital Elements (a, e, i, Ω, ω, ν).<br>
+      Given Earth's gravitational parameter: <b>μ = 3.986004 × 10<sup>6</sup> km<sup>3</sup>/s<sup>2</sup></b>.
+    </div>
+
+    <!-- STEP 1 -->
+    <h4>Step 1 — Calculate Magnitudes and Basic Helper Scalars</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equations</div>
+      <div class="eq">
+        r = √(x<sup>2</sup> + y<sup>2</sup> + z<sup>2</sup>)<br>
+        v = √(v<sub>x</sub><sup>2</sup> + v<sub>y</sub><sup>2</sup> + v<sub>z</sub><sup>2</sup>)<br>
+        v<sub>r</sub> = <span class="frac"><span class="num">r⃗ · v⃗</span><span class="den">r</span></span>
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>x, y, z</b> — position components <span class="u">(km)</span> = 6500, 3400, 4100</div>
+      <div><b>v<sub>x</sub>, v<sub>y</sub>, v<sub>z</sub></b> — velocity components <span class="u">(km/s)</span> = −4.9, 5.2, 3.4</div>
+      <div><b>r</b> — position magnitude <span class="u">(km)</span></div>
+      <div><b>v</b> — velocity magnitude <span class="u">(km/s)</span></div>
+      <div><b>v<sub>r</sub></b> — radial velocity component <span class="u">(km/s)</span></div>
+      <div><b>r⃗ · v⃗</b> — dot product <span class="u">(km<sup>2</sup>/s)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        r = √(6500<sup>2</sup> + 3400<sup>2</sup> + 4100<sup>2</sup>)<br>
+        &nbsp;&nbsp;= √(42 250 000 + 11 560 000 + 16 810 000) = √70 620 000<br><br>
+        v = √((−4.9)<sup>2</sup> + 5.2<sup>2</sup> + 3.4<sup>2</sup>)<br>
+        &nbsp;&nbsp;= √(24.01 + 27.04 + 11.56) = √62.61<br><br>
+        r⃗ · v⃗ = (6500 × −4.9) + (3400 × 5.2) + (4100 × 3.4)<br>
+        &nbsp;&nbsp;= −31 850 + 17 680 + 13 940 = −230
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 1</div>
+      <div class="eq">
+        r = 8403.57 km &nbsp;·&nbsp; v = 7.9126 km/s<br>
+        r⃗ · v⃗ = −230 km<sup>2</sup>/s &nbsp;(negative ⇒ flying toward perigee)
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <h4>Step 2 — Semi-Major Axis (a)</h4>
+
+    <div class="formula">
+      <div class="lbl">Specific mechanical energy &amp; semi-major axis</div>
+      <div class="eq">
+        E = <span class="frac"><span class="num">v<sup>2</sup></span><span class="den">2</span></span> − <span class="frac"><span class="num">μ</span><span class="den">r</span></span> = − <span class="frac"><span class="num">μ</span><span class="den">2a</span></span>
+        &nbsp;&nbsp;⟹&nbsp;&nbsp;
+        a = − <span class="frac"><span class="num">μ</span><span class="den">2E</span></span>
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>E</b> — specific mechanical energy <span class="u">(km<sup>2</sup>/s<sup>2</sup>)</span></div>
+      <div><b>v</b> — velocity magnitude <span class="u">(= 7.9126 km/s)</span></div>
+      <div><b>μ</b> — Earth's gravitational parameter <span class="u">(= 398 600.4 km<sup>3</sup>/s<sup>2</sup>)</span></div>
+      <div><b>r</b> — position magnitude <span class="u">(= 8403.57 km)</span></div>
+      <div><b>a</b> — semi-major axis <span class="u">(km)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        E = <span class="frac"><span class="num">7.9126<sup>2</sup></span><span class="den">2</span></span> − <span class="frac"><span class="num">398 600.4</span><span class="den">8403.57</span></span><br>
+        &nbsp;&nbsp;= 31.305 − 47.432 = −16.127<br><br>
+        a = − <span class="frac"><span class="num">398 600.4</span><span class="den">2 × (−16.127)</span></span>
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 2</div>
+      <div class="eq">a ≈ 12 358.1 km</div>
+    </div>
+
+    <!-- STEP 3 -->
+    <h4>Step 3 — Angular Momentum Vector (h⃗)</h4>
+
+    <div class="formula">
+      <div class="lbl">Specific angular momentum</div>
+      <div class="eq">
+        h⃗ = r⃗ × v⃗ =
+        det
+        <span style="display:inline-block;border-left:1px solid var(--muted);border-right:1px solid var(--muted);padding:0 .4em;">
+          î &nbsp; ĵ &nbsp; k̂<br>
+          x &nbsp; y &nbsp; z<br>
+          v<sub>x</sub> &nbsp; v<sub>y</sub> &nbsp; v<sub>z</sub>
+        </span>
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>h⃗</b> — specific angular momentum vector <span class="u">(km<sup>2</sup>/s)</span>; defines the orientation of the orbital plane</div>
+      <div><b>î, ĵ, k̂</b> — unit vectors of the GEI frame</div>
+      <div><b>x, y, z</b> — position components <span class="u">(km)</span></div>
+      <div><b>v<sub>x</sub>, v<sub>y</sub>, v<sub>z</sub></b> — velocity components <span class="u">(km/s)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        h<sub>x</sub> = (3400 × 3.4) − (4100 × 5.2) = 11 560 − 21 320 = −9760<br>
+        h<sub>y</sub> = (4100 × −4.9) − (6500 × 3.4) = −20 090 − 22 100 = −42 190<br>
+        h<sub>z</sub> = (6500 × 5.2) − (3400 × −4.9) = 33 800 + 16 660 = 50 460<br><br>
+        h = √(h<sub>x</sub><sup>2</sup> + h<sub>y</sub><sup>2</sup> + h<sub>z</sub><sup>2</sup>)
+        = √((−9760)<sup>2</sup> + (−42 190)<sup>2</sup> + 50 460<sup>2</sup>)
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 3</div>
+      <div class="eq">
+        h⃗ = −9760 î − 42 190 ĵ + 50 460 k̂ &nbsp;(km<sup>2</sup>/s)<br>
+        h = |h⃗| ≈ 66 498 km<sup>2</sup>/s
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <h4>Step 4 — Eccentricity (e)</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">e = √( 1 − <span class="frac"><span class="num">h<sup>2</sup></span><span class="den">μ a</span></span> )</div>
+    </div>
+
+    <div class="vars">
+      <div><b>e</b> — eccentricity <span class="u">(dimensionless)</span></div>
+      <div><b>h</b> — angular momentum magnitude <span class="u">(= 66 497.8 km<sup>2</sup>/s)</span></div>
+      <div><b>μ</b> — gravitational parameter <span class="u">(= 398 600.4 km<sup>3</sup>/s<sup>2</sup>)</span></div>
+      <div><b>a</b> — semi-major axis <span class="u">(= 12 358.1 km)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        e = √( 1 − <span class="frac"><span class="num">(66 497.8)<sup>2</sup></span><span class="den">398 600.4 × 12 358.1</span></span> )<br>
+        &nbsp;&nbsp;= √( 1 − <span class="frac"><span class="num">4.4219 × 10<sup>9</sup></span><span class="den">4.9259 × 10<sup>9</sup></span></span> )<br>
+        &nbsp;&nbsp;= √(1 − 0.8977) = √0.1023
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 4</div>
+      <div class="eq">e ≈ 0.320 &nbsp;(elliptical orbit)</div>
+    </div>
+
+    <!-- STEP 5 -->
+    <h4>Step 5 — Inclination (i)</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">cos i = <span class="frac"><span class="num">h<sub>z</sub></span><span class="den">h</span></span></div>
+    </div>
+
+    <div class="vars">
+      <div><b>i</b> — inclination <span class="u">(degrees, 0°–180°)</span></div>
+      <div><b>h<sub>z</sub></b> — z-component of h⃗ <span class="u">(= 50 460 km<sup>2</sup>/s)</span></div>
+      <div><b>h</b> — magnitude of h⃗ <span class="u">(= 66 497.8 km<sup>2</sup>/s)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">cos i = <span class="frac"><span class="num">50 460</span><span class="den">66 497.8</span></span> ≈ 0.7588</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 5</div>
+      <div class="eq">i ≈ 40.65° &nbsp;(prograde orbit)</div>
+    </div>
+
+    <!-- STEP 6 -->
+    <h4>Step 6 — Right Ascension of the Ascending Node (Ω)</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equations</div>
+      <div class="eq">
+        n⃗ = k̂ × h⃗ = (−h<sub>y</sub>, h<sub>x</sub>, 0)<br>
+        Ω = atan2( n<sub>y</sub> , n<sub>x</sub> )
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>n⃗</b> — node vector, pointing to the ascending node <span class="u">(km<sup>2</sup>/s)</span></div>
+      <div><b>k̂</b> — Earth's Z-axis unit vector <span class="u">(0, 0, 1)</span></div>
+      <div><b>h<sub>x</sub>, h<sub>y</sub></b> — components of h⃗ <span class="u">(= −9760, −42 190)</span></div>
+      <div><b>Ω</b> — RAAN measured eastward from vernal equinox <span class="u">(degrees)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        n⃗ = (42 190, −9760, 0)<br>
+        Ω = atan2(−9760, 42 190) = −13.03°
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 6</div>
+      <div class="eq">Ω ≈ 346.97° &nbsp;(adding 360° to make it positive)</div>
+    </div>
+
+    <!-- STEP 7 -->
+    <h4>Step 7 — Argument of Perigee (ω)</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equations</div>
+      <div class="eq">
+        e⃗ = <span class="frac"><span class="num">1</span><span class="den">μ</span></span> [ ( v<sup>2</sup> − <span class="frac"><span class="num">μ</span><span class="den">r</span></span> ) r⃗ − ( r⃗ · v⃗ ) v⃗ ]<br><br>
+        cos ω = <span class="frac"><span class="num">n⃗ · e⃗</span><span class="den">|n⃗| |e⃗|</span></span>
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>e⃗</b> — eccentricity vector (points to perigee)</div>
+      <div><b>v<sup>2</sup></b> — squared speed <span class="u">(= 62.61 km<sup>2</sup>/s<sup>2</sup>)</span></div>
+      <div><b>μ/r</b> — gravitational term <span class="u">(= 47.432 km<sup>2</sup>/s<sup>2</sup>)</span></div>
+      <div><b>r⃗ · v⃗</b> — dot product <span class="u">(= −230 km<sup>2</sup>/s)</span></div>
+      <div><b>ω</b> — argument of perigee <span class="u">(degrees)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        e⃗ = <span class="frac"><span class="num">1</span><span class="den">398 600.4</span></span> [ 15.178 (6500, 3400, 4100) + 230 (−4.9, 5.2, 3.4) ]<br>
+        &nbsp;&nbsp;= (0.2447, 0.1325, 0.1581)<br><br>
+        |n⃗| = √(42 190<sup>2</sup> + 9760<sup>2</sup>) ≈ 43 304<br>
+        n⃗ · e⃗ = (42 190 × 0.2447) + (−9760 × 0.1325) ≈ 9030<br><br>
+        cos ω = <span class="frac"><span class="num">9030</span><span class="den">43 304 × 0.320</span></span> ≈ 0.652
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 7</div>
+      <div class="eq">ω ≈ 49.3°</div>
+    </div>
+
+    <!-- STEP 8 -->
+    <h4>Step 8 — True Anomaly (ν)</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">cos ν = <span class="frac"><span class="num">e⃗ · r⃗</span><span class="den">|e⃗| r</span></span></div>
+    </div>
+
+    <div class="vars">
+      <div><b>ν</b> — true anomaly <span class="u">(degrees)</span></div>
+      <div><b>e⃗</b> — eccentricity vector <span class="u">(= (0.2447, 0.1325, 0.1581))</span></div>
+      <div><b>r⃗</b> — position vector <span class="u">(= (6500, 3400, 4100) km)</span></div>
+      <div><b>r</b> — position magnitude <span class="u">(= 8403.57 km)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        e⃗ · r⃗ = (0.2447 × 6500) + (0.1325 × 3400) + (0.1581 × 4100) ≈ 2689<br>
+        cos ν = <span class="frac"><span class="num">2689</span><span class="den">0.320 × 8403.57</span></span> ≈ 0.9999
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 8</div>
+      <div class="eq">ν ≈ 0.8° after perigee; since v<sub>r</sub> &lt; 0 → ν ≈ 359.2°</div>
+    </div>
+
+    <div class="note">
+      <b class="warn">Sanity check:</b> perigee radius r<sub>p</sub> = a(1 − e) = 12 358.1 × (1 − 0.320) ≈ 8403 km — essentially equal to the given r. The satellite is right at perigee, which matches ν ≈ 359°.
+    </div>
+
+    <h3>Summary of the Six Classical Orbital Elements</h3>
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr><th>Element</th><th>Symbol</th><th>Value</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Semi-major axis</td><td>a</td><td>12 358.1 km</td><td>Size</td></tr>
+          <tr><td>Eccentricity</td><td>e</td><td>0.320</td><td>Shape (ellipse)</td></tr>
+          <tr><td>Inclination</td><td>i</td><td>40.65°</td><td>Tilt (prograde)</td></tr>
+          <tr><td>RAAN</td><td>Ω</td><td>346.97°</td><td>Twist of orbital plane</td></tr>
+          <tr><td>Argument of perigee</td><td>ω</td><td>49.3°</td><td>Rotation in plane</td></tr>
+          <tr><td>True anomaly</td><td>ν</td><td>≈ 359.2°</td><td>Position at epoch</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- IMAGE SLOT: after Pg 41 -->
+    <figure class="imgSlot" data-img="img9" data-cap="Figure 9 — Pg 41">
+      <div class="ph">img9.jpg</div>
+      <figcaption>Figure 9 · after Pg 41 content</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= SECTION 9 : LUNISOLAR ================= -->
+  <section id="num-lunisolar" class="mode-numericals">
+    <h2>9 · Third-Body Lunisolar Perturbations (Analytical View)</h2>
+
+    <div class="q">
+      <b>Problem statement:</b> A communications satellite is parked in a Geostationary Earth Orbit (GEO) with a semi-major axis <b>a = 42 164 km</b>, an inclination <b>i = 0°</b> and an eccentricity <b>e = 0</b>. Calculate the worst-case maximum secular rate of change of inclination (di/dt) caused by the Moon's gravitational perturbation over a long period.
+    </div>
+
+    <h3>Given Constants</h3>
+    <div class="vars">
+      <div><b>ω<sub>E</sub></b> — Earth's rotation rate ≈ 7.292 × 10<sup>−5</sup> rad/s</div>
+      <div><b>n</b> — satellite mean motion = √(μ/a<sup>3</sup>) ≈ 7.292 × 10<sup>−5</sup> rad/s (1 rev/day)</div>
+      <div><b>n<sub>m</sub></b> — Moon's mean motion around Earth ≈ 2.66 × 10<sup>−6</sup> rad/s (27.3 days)</div>
+      <div><b>μ<sub>m</sub><sup>*</sup></b> — Moon's mass ratio, M<sub>Moon</sub>/(M<sub>Earth</sub> + M<sub>Moon</sub>) ≈ 0.0123</div>
+      <div><b>i<sub>m</sub></b> — maximum inclination of the Moon's orbit relative to Earth's equator ≈ 28.5°</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <h4>Step 1 — Calculate the trigonometric factor</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">sin(2 i<sub>m</sub>)</div>
+    </div>
+
+    <div class="vars">
+      <div><b>i<sub>m</sub></b> — maximum inclination of the Moon's orbit to Earth's equator <span class="u">(= 28.5°)</span></div>
+      <div><b>sin(2i<sub>m</sub>)</b> — trigonometric factor <span class="u">(dimensionless)</span></div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">sin(2 × 28.5°) = sin(57°) ≈ 0.8387</div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 1</div>
+      <div class="eq">sin(2i<sub>m</sub>) ≈ 0.8387</div>
+    </div>
+
+    <!-- STEP 2 -->
+    <h4>Step 2 — Compute the secular inclination drift rate</h4>
+    <p>The maximum long-term secular drift in inclination (di/dt) for a circular equatorial orbit due to a third body is governed by:</p>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">
+        i̇<sub>max</sub> = <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+        <span class="frac"><span class="num">n<sub>m</sub><sup>2</sup></span><span class="den">n</span></span>
+        μ<sub>m</sub><sup>*</sup> sin(2 i<sub>m</sub>)
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>i̇<sub>max</sub></b> — maximum secular rate of change of inclination <span class="u">(rad/s)</span></div>
+      <div><b>n<sub>m</sub></b> — Moon's mean motion <span class="u">(= 2.66 × 10<sup>−6</sup> rad/s)</span></div>
+      <div><b>n</b> — satellite mean motion <span class="u">(= 7.292 × 10<sup>−5</sup> rad/s)</span></div>
+      <div><b>μ<sub>m</sub><sup>*</sup></b> — Moon's mass ratio <span class="u">(= 0.0123)</span></div>
+      <div><b>i<sub>m</sub></b> — Moon's orbital inclination to the equator <span class="u">(= 28.5°)</span></div>
+      <div><b>3/4</b> — geometric coefficient for the third-body secular term</div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        i̇<sub>max</sub> = <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+        ( <span class="frac"><span class="num">2.66 × 10<sup>−6</sup> rad/s</span><span class="den">7.292 × 10<sup>−5</sup> rad/s</span></span> )
+        × 0.0123 × 0.8387<br><br>
+        = 0.75 × (9.703 × 10<sup>−8</sup>) × 0.0123 × 0.8387
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Result of Step 2</div>
+      <div class="eq">i̇<sub>max</sub> ≈ 7.51 × 10<sup>−10</sup> rad/s</div>
+    </div>
+
+    <!-- STEP 3 -->
+    <h4>Step 3 — Convert to degrees per year</h4>
+
+    <div class="formula">
+      <div class="lbl">Governing equation</div>
+      <div class="eq">
+        i̇<sub>max</sub> [°/yr] = i̇<sub>max</sub> [rad/s] × <span class="frac"><span class="num">180°</span><span class="den">π</span></span> × (86 400 s/day × 365.25 days/year)
+      </div>
+    </div>
+
+    <div class="vars">
+      <div><b>i̇<sub>max</sub></b> — drift rate <span class="u">(7.51 × 10<sup>−10</sup> rad/s → °/yr)</span></div>
+      <div><b>180°/π</b> — radians-to-degrees conversion <span class="u">(≈ 57.2958 °/rad)</span></div>
+      <div><b>86 400 s/day</b> — seconds in one day</div>
+      <div><b>365.25 days/year</b> — days in one Julian year</div>
+    </div>
+
+    <div class="formula">
+      <div class="lbl">Substitution</div>
+      <div class="eq">
+        i̇<sub>max</sub> ≈ 7.51 × 10<sup>−10</sup> × 57.2958 × 31 557 600<br>
+        &nbsp;&nbsp;≈ 7.51 × 10<sup>−10</sup> × 1.808 × 10<sup>9</sup>
+      </div>
+    </div>
+
+    <div class="formula result">
+      <div class="lbl">Final answer</div>
+      <div class="eq">i̇<sub>max</sub> ≈ 1.36 °/year</div>
+    </div>
+
+    <div class="note">
+      <b class="warn">Note:</b> Combined with the Sun's gravity, this total lunisolar gravitational perturbation causes GEO satellite inclinations to drift by roughly <b>0.86° to 0.95° per year</b>, requiring continuous <b>north–south station-keeping</b>.
+    </div>
+
+    <!-- IMAGE SLOT: after Pg 46 -->
+    <figure class="imgSlot" data-img="img10" data-cap="Figure 10 — Pg 46">
+      <div class="ph">img10.jpg</div>
+      <figcaption>Figure 10 · after Pg 46 content</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= SECTION 10 : FORMULAS ================= -->
+  <section id="formulas" class="mode-formulas">
+    <h2>10 · All Formulas + Variables</h2>
+
+    <h3>🪐 Kepler's Laws &amp; Orbital Mechanics</h3>
+    <div class="flookupCards">
+
+      <div class="flookup">
+        <h4>Kepler's Third Law (general)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">T<sup>2</sup> = <span class="frac"><span class="num">4π<sup>2</sup></span><span class="den">GM</span></span> a<sup>3</sup></div>
+        </div>
+        <div class="vars">
+          <div><b>T</b> — orbital period <span class="u">(s)</span></div>
+          <div><b>a</b> — semi-major axis <span class="u">(m)</span></div>
+          <div><b>G</b> — gravitational constant <span class="u">(6.674×10<sup>−11</sup> m<sup>3</sup>kg<sup>−1</sup>s<sup>−2</sup>)</span></div>
+          <div><b>M</b> — mass of central body <span class="u">(kg)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Kepler's Third Law (solar units)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">T<sup>2</sup> = a<sup>3</sup></div>
+        </div>
+        <div class="vars">
+          <div><b>T</b> — period <span class="u">(Earth years)</span>, typical 1 for Earth</div>
+          <div><b>a</b> — semi-major axis <span class="u">(AU)</span>, typical 1 for Earth</div>
+          <div><b>Condition</b> — M in solar masses M<sub>☉</sub>, so 4π<sup>2</sup>/G = 1</div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Kepler's Third Law (ratio form)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq"><span class="frac"><span class="num">T<sub>1</sub><sup>2</sup></span><span class="den">T<sub>2</sub><sup>2</sup></span></span> = <span class="frac"><span class="num">a<sub>1</sub><sup>3</sup></span><span class="den">a<sub>2</sub><sup>3</sup></span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>T<sub>1</sub>, T<sub>2</sub></b> — periods of two bodies <span class="u">(same units)</span></div>
+          <div><b>a<sub>1</sub>, a<sub>2</sub></b> — semi-major axes <span class="u">(same units)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Kepler's Second Law (areal velocity)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq"><span class="frac"><span class="num">ΔA</span><span class="den">Δt</span></span> = constant &nbsp;=&nbsp; <span class="frac"><span class="num">h</span><span class="den">2</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>ΔA</b> — area swept <span class="u">(km<sup>2</sup>)</span></div>
+          <div><b>Δt</b> — time interval <span class="u">(s)</span></div>
+          <div><b>h</b> — specific angular momentum <span class="u">(km<sup>2</sup>/s)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Semi-major axis from apsides</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">a = <span class="frac"><span class="num">r<sub>min</sub> + r<sub>max</sub></span><span class="den">2</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>a</b> — semi-major axis <span class="u">(AU or km)</span></div>
+          <div><b>r<sub>min</sub></b> — periapsis distance <span class="u">(perihelion / perigee)</span></div>
+          <div><b>r<sub>max</sub></b> — apoapsis distance <span class="u">(aphelion / apogee)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Eccentricity (from focal distance)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">c = a − r<sub>min</sub> &nbsp;&nbsp;·&nbsp;&nbsp; e = <span class="frac"><span class="num">c</span><span class="den">a</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>e</b> — eccentricity <span class="u">(0 = circle, 0&lt;e&lt;1 ellipse)</span></div>
+          <div><b>c</b> — focal distance from ellipse centre <span class="u">(AU or km)</span></div>
+          <div><b>a</b> — semi-major axis <span class="u">(AU or km)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Mean motion</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">n = √( <span class="frac"><span class="num">μ</span><span class="den">a<sup>3</sup></span></span> )</div>
+        </div>
+        <div class="vars">
+          <div><b>n</b> — mean motion <span class="u">(rad/s)</span>; GEO ≈ 7.292×10<sup>−5</sup></div>
+          <div><b>μ</b> — gravitational parameter <span class="u">(398 600.4 km<sup>3</sup>/s<sup>2</sup> for Earth)</span></div>
+          <div><b>a</b> — semi-major axis <span class="u">(km)</span>; GEO ≈ 42 164 km</div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Specific mechanical energy → semi-major axis</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">E = <span class="frac"><span class="num">v<sup>2</sup></span><span class="den">2</span></span> − <span class="frac"><span class="num">μ</span><span class="den">r</span></span> = − <span class="frac"><span class="num">μ</span><span class="den">2a</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>E</b> — specific mechanical energy <span class="u">(km<sup>2</sup>/s<sup>2</sup>)</span></div>
+          <div><b>v</b> — speed <span class="u">(km/s)</span></div>
+          <div><b>μ</b> — gravitational parameter <span class="u">(km<sup>3</sup>/s<sup>2</sup>)</span></div>
+          <div><b>r</b> — radius from focus <span class="u">(km)</span></div>
+          <div><b>a</b> — semi-major axis <span class="u">(km)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Specific angular momentum vector</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">h⃗ = r⃗ × v⃗ &nbsp;&nbsp;·&nbsp;&nbsp; h = |h⃗|</div>
+        </div>
+        <div class="vars">
+          <div><b>h⃗</b> — angular momentum vector <span class="u">(km<sup>2</sup>/s)</span>; normal to orbital plane</div>
+          <div><b>r⃗</b> — position vector <span class="u">(km)</span></div>
+          <div><b>v⃗</b> — velocity vector <span class="u">(km/s)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Eccentricity from h and a</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">e = √( 1 − <span class="frac"><span class="num">h<sup>2</sup></span><span class="den">μ a</span></span> )</div>
+        </div>
+        <div class="vars">
+          <div><b>e</b> — eccentricity <span class="u">(dimensionless)</span></div>
+          <div><b>h</b> — angular momentum magnitude <span class="u">(km<sup>2</sup>/s)</span></div>
+          <div><b>μ</b> — gravitational parameter <span class="u">(km<sup>3</sup>/s<sup>2</sup>)</span></div>
+          <div><b>a</b> — semi-major axis <span class="u">(km)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Inclination</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">cos i = <span class="frac"><span class="num">h<sub>z</sub></span><span class="den">h</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>i</b> — inclination <span class="u">(0°–180°)</span></div>
+          <div><b>h<sub>z</sub></b> — z-component of h⃗ <span class="u">(km<sup>2</sup>/s)</span></div>
+          <div><b>h</b> — magnitude of h⃗ <span class="u">(km<sup>2</sup>/s)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Right Ascension of the Ascending Node (RAAN)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">n⃗ = k̂ × h⃗ = (−h<sub>y</sub>, h<sub>x</sub>, 0)<br>Ω = atan2(n<sub>y</sub>, n<sub>x</sub>)</div>
+        </div>
+        <div class="vars">
+          <div><b>Ω</b> — RAAN from vernal equinox eastward <span class="u">(rad or °)</span></div>
+          <div><b>n⃗</b> — node vector toward ascending node</div>
+          <div><b>k̂</b> — Earth's Z-axis unit vector <span class="u">(0,0,1)</span></div>
+          <div><b>h<sub>x</sub>, h<sub>y</sub></b> — components of h⃗ <span class="u">(km<sup>2</sup>/s)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Argument of Perigee</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">cos ω = <span class="frac"><span class="num">n⃗ · e⃗</span><span class="den">|n⃗| |e⃗|</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>ω</b> — argument of perigee <span class="u">(rad or °)</span></div>
+          <div><b>n⃗</b> — node vector</div>
+          <div><b>e⃗</b> — eccentricity vector (points to perigee)</div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Eccentricity vector</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">e⃗ = <span class="frac"><span class="num">1</span><span class="den">μ</span></span> [ ( v<sup>2</sup> − <span class="frac"><span class="num">μ</span><span class="den">r</span></span> ) r⃗ − ( r⃗ · v⃗ ) v⃗ ]</div>
+        </div>
+        <div class="vars">
+          <div><b>e⃗</b> — eccentricity vector <span class="u">(dimensionless)</span></div>
+          <div><b>v</b> — speed <span class="u">(km/s)</span></div>
+          <div><b>r</b> — radius <span class="u">(km)</span></div>
+          <div><b>μ</b> — gravitational parameter <span class="u">(km<sup>3</sup>/s<sup>2</sup>)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>True Anomaly</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">cos ν = <span class="frac"><span class="num">e⃗ · r⃗</span><span class="den">|e⃗| r</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>ν</b> — true anomaly <span class="u">(rad or °)</span>; 0° at perigee, 180° at apogee</div>
+          <div><b>e⃗</b> — eccentricity vector</div>
+          <div><b>r⃗</b> — position vector <span class="u">(km)</span></div>
+          <div><b>r</b> — position magnitude <span class="u">(km)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Radial velocity</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">v<sub>r</sub> = <span class="frac"><span class="num">r⃗ · v⃗</span><span class="den">r</span></span></div>
+        </div>
+        <div class="vars">
+          <div><b>v<sub>r</sub></b> — radial velocity <span class="u">(km/s)</span>; &lt;0 → approaching perigee</div>
+          <div><b>r⃗ · v⃗</b> — dot product <span class="u">(km<sup>2</sup>/s)</span></div>
+          <div><b>r</b> — position magnitude <span class="u">(km)</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <h3>🌀 Third-Body (Lunisolar) Perturbations</h3>
+    <div class="flookupCards">
+
+      <div class="flookup">
+        <h4>Maximum secular inclination drift (third body)</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">
+            i̇<sub>max</sub> = <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+            <span class="frac"><span class="num">n<sub>m</sub><sup>2</sup></span><span class="den">n</span></span>
+            μ<sub>m</sub><sup>*</sup> sin(2 i<sub>m</sub>)
+          </div>
+        </div>
+        <div class="vars">
+          <div><b>i̇<sub>max</sub></b> — max secular drift rate <span class="u">(rad/s)</span>; GEO ≈ 7.51×10<sup>−10</sup> rad/s</div>
+          <div><b>n<sub>m</sub></b> — Moon's mean motion <span class="u">(2.66×10<sup>−6</sup> rad/s)</span></div>
+          <div><b>n</b> — satellite mean motion <span class="u">(7.292×10<sup>−5</sup> rad/s for GEO)</span></div>
+          <div><b>μ<sub>m</sub><sup>*</sup></b> — Moon mass ratio <span class="u">(0.0123)</span></div>
+          <div><b>i<sub>m</sub></b> — Moon's orbit inclination to equator <span class="u">(28.5°)</span></div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Unit conversions for drift rates</h4>
+        <div class="formula">
+          <div class="lbl">Equation</div>
+          <div class="eq">
+            i̇ [°/yr] = i̇ [rad/s] × <span class="frac"><span class="num">180°</span><span class="den">π</span></span> × 86 400 × 365.25
+          </div>
+        </div>
+        <div class="vars">
+          <div><b>180°/π</b> — rad → deg <span class="u">(57.2958)</span></div>
+          <div><b>86 400</b> — seconds per day <span class="u">(s/day)</span></div>
+          <div><b>365.25</b> — days per Julian year <span class="u">(days/yr)</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <h3>📡 Spectrum &amp; Regulatory Reference</h3>
+    <div class="flookupCards">
+      <div class="flookup">
+        <h4>ITU Regions</h4>
+        <div class="formula">
+          <div class="lbl">Regions</div>
+          <div class="eq">R1 · Europe, Africa, Middle East, ex-USSR, Mongolia<br>R2 · North &amp; South America, Greenland<br>R3 · Asia (incl. India), Australia, SW Pacific</div>
+        </div>
+        <div class="vars">
+          <div><b>FSS</b> — Fixed Satellite Service</div>
+          <div><b>BSS</b> — Broadcasting Satellite Service (DTH)</div>
+          <div><b>MSS</b> — Mobile Satellite Service</div>
+          <div><b>NSS</b> — Navigational Satellite Service (GPS, NavIC)</div>
+          <div><b>Bands</b> — L, S, C, X, Ku, Ka</div>
+        </div>
+      </div>
+
+      <div class="flookup">
+        <h4>Six Classical Orbital Elements</h4>
+        <div class="formula">
+          <div class="lbl">Set</div>
+          <div class="eq">a [m] · e [–] · i [rad] · ω [rad] · Ω [rad] · M [rad]</div>
+        </div>
+        <div class="vars">
+          <div><b>a</b> — semi-major axis, size</div>
+          <div><b>e</b> — eccentricity, shape</div>
+          <div><b>i</b> — inclination, tilt</div>
+          <div><b>Ω</b> — RAAN, twist</div>
+          <div><b>ω</b> — argument of perigee, rotation</div>
+          <div><b>M / ν</b> — mean / true anomaly, position</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  </div><!-- /#sections -->
+</main>
+
+<!-- ============ FLOATING CONTROLS ============ -->
+<button id="toTop" aria-label="Back to top">▲</button>
+
+<div id="modeSwitch" role="group" aria-label="Study mode">
+  <button type="button" data-mode="notes">📘 Notes</button>
+  <button type="button" data-mode="numericals">🧮 Numericals</button>
+  <button type="button" data-mode="formulas">📐 Formulas</button>
+</div>
+
+<script>
+/* ============================================================
+   IMAGE CONFIG — the ONLY place you need to edit for pictures.
+   Drop img1.jpg … img10.jpg in the same folder as this HTML file.
+   ============================================================ */
+const IMAGES = {
+  img1:  "img1.jpg",
+  img2:  "img2.jpg",
+  img3:  "img3.jpg",
+  img4:  "img4.jpg",
+  img5:  "img5.jpg",
+  img6:  "img6.jpg",
+  img7:  "img7.jpg",
+  img8:  "img8.jpg",
+  img9:  "img9.jpg",
+  img10: "img10.jpg"
+};
+
+/* ---------- Image slot loader ---------- */
+document.querySelectorAll('.imgSlot').forEach(function(fig){
+  var key  = fig.dataset.img;
+  var file = IMAGES[key];
+  var ph   = fig.querySelector('.ph');
+  if(!file || !ph) return;
+
+  var img = document.createElement('img');
+  img.src = file;
+  img.alt = fig.dataset.cap || key;
+  img.loading = 'lazy';
+
+  img.onload = function(){ if(ph && ph.parentNode) ph.remove(); };
+  img.onerror = function(){
+    img.remove();
+    ph.textContent = file + ' — not found (add it to the folder)';
+  };
+
+  fig.insertBefore(img, ph);
+});
+
+/* ---------- Drawer ---------- */
+var body      = document.body;
+var menuBtn   = document.getElementById('menuBtn');
+var drawer    = document.getElementById('drawer');
+var drawerCl  = document.getElementById('drawerClose');
+var overlay   = document.getElementById('overlay');
+
+function openDrawer(){
+  body.classList.add('drawerOpen');
+  drawer.setAttribute('aria-hidden','false');
+  menuBtn.setAttribute('aria-expanded','true');
+}
+function closeDrawer(){
+  body.classList.remove('drawerOpen');
+  drawer.setAttribute('aria-hidden','true');
+  menuBtn.setAttribute('aria-expanded','false');
+}
+menuBtn.addEventListener('click', openDrawer);
+drawerCl.addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeDrawer();
+});
+drawer.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){ setTimeout(closeDrawer, 80); });
+});
+
+/* ---------- Mode switcher ---------- */
+var MODE_KEY = 'studyMode';
+var segs = Array.prototype.slice.call(document.querySelectorAll('#modeSwitch button'));
+
+function setMode(mode){
+  body.dataset.mode = mode;
+  try { localStorage.setItem(MODE_KEY, mode); } catch(e){}
+  segs.forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+}
+
+var saved = null;
+try { saved = localStorage.getItem(MODE_KEY); } catch(e){}
+
+var modesPresent = new Set();
+document.querySelectorAll('section').forEach(function(s){
+  var m = (s.className || '').match(/mode-(notes|numericals|formulas)/);
+  if(m) modesPresent.add(m[1]);
+});
+
+var switchEl = document.getElementById('modeSwitch');
+if(modesPresent.size < 2){
+  switchEl.style.display = 'none';
+  var only = modesPresent.values().next().value;
+  if(only) body.dataset.mode = only;
+} else {
+  setMode(saved && modesPresent.has(saved) ? saved : 'notes');
+  segs.forEach(function(b){
+    b.addEventListener('click', function(){ setMode(b.dataset.mode); });
+  });
+}
+
+/* ---------- Back to top ---------- */
+var toTop = document.getElementById('toTop');
+
+window.addEventListener('scroll', function(){
+  if(window.scrollY > 320) body.classList.add('scrolled');
+  else body.classList.remove('scrolled');
+}, {passive:true});
+
+toTop.addEventListener('click', function(){
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+</script>
+
+</body>
+</html>
